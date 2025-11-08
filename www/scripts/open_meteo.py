@@ -10,11 +10,11 @@ cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
 retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 openmeteo = openmeteo_requests.Client(session = retry_session)
 
-def get_daily_temps(lat, long, start=None, end):
+def get_daily_temps(lat, long, end, start=None):
+
 
     if start is None:
-        year = datetime.datetime.strptime(my_date, "%Y-%m-%d").year
-        start = str(year) + "-01-01"
+        start = str(end.year) + "-01-01"
     # Make sure all required weather variables are listed here
     # The order of variables in hourly or daily is important to assign them correctly below
     url = "https://historical-forecast-api.open-meteo.com/v1/forecast"
@@ -43,8 +43,8 @@ def get_daily_temps(lat, long, start=None, end):
     	inclusive = "left"
     )}
 
-    daily_data["temperature_2m_max"] = daily_temperature_2m_max
-    daily_data["temperature_2m_min"] = daily_temperature_2m_min
+    daily_data["temp_max"] = daily_temperature_2m_max
+    daily_data["temp_min"] = daily_temperature_2m_min
 
     daily_dataframe = pd.DataFrame(data = daily_data)
     return daily_dataframe

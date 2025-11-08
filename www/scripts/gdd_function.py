@@ -1,13 +1,7 @@
 from www.scripts.open_meteo import get_daily_temps
 
-test = get_daily_temps(39.0, -79.1, "2021-01-01", "2021-06-31") 
-
-temps = test.copy()
-# There are two different methods of calculating growing degree day
-max = 29
-min = 10
 # This is method one
-def gdd_method1(data, min, max, min_name = "min", max_name = "max", 
+def gdd_method1(data, min, max, min_name = "temp_min", max_name = "temp_max", 
 celsius = True):
     df = data.copy()
     if (not celsius):
@@ -23,8 +17,8 @@ celsius = True):
 def gdd_method2(data,
                 min,
                 max,
-                min_name = "min",
-                max_name = "max",
+                min_name = "temp_min",
+                max_name = "temp_max",
                 celsius = True
 ):
     df = data.copy()
@@ -39,6 +33,9 @@ def gdd_method2(data,
     df["gdd"] = df["single_day_gd"].cumsum()
     return df
 
-test2 = gdd_method1(temps, 10, 29, "temperature_2m_min", "temperature_2m_max")
-test3 = gdd_method2(temps, 10, 29, "temperature_2m_min", "temperature_2m_max")
-
+# mydate = "2021-06-30"
+# test = datetime.datetime.date(mydate)
+# mydate = datetime.datetime.strptime(mydate, "%Y-%m-%d")
+# type(mydate)
+# print(mydate)
+# test = get_daily_temps(lat =39.0, long=-79.1, end=test) 
