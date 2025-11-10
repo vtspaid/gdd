@@ -1,6 +1,5 @@
 
 import openmeteo_requests
-import datetime
 
 import pandas as pd
 import requests_cache
