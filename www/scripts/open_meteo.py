@@ -10,7 +10,7 @@ cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
 retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 openmeteo = openmeteo_requests.Client(session = retry_session)
 
-def get_daily_temps(lat, long, end, start=None):
+def get_daily_temps(lat, long, end, start=None, sitenames=None):
 
 
     if start is None:
@@ -28,24 +28,39 @@ def get_daily_temps(lat, long, end, start=None):
     }
     responses = openmeteo.weather_api(url, params=params)
 
-    # Process first location. Add a for-loop for multiple locations or weather models
-    response = responses[0]
+    # Initialize empty list to hold results
+    dataframe_list = []
 
-    # Process daily data. The order of variables needs to be the same as requested.
-    daily = response.Daily()
-    daily_temperature_2m_max = daily.Variables(0).ValuesAsNumpy()
-    daily_temperature_2m_min = daily.Variables(1).ValuesAsNumpy()
+    if sitenames is None:
+        sitenames = list(range(0, len(lat)))
+        sitenames  = [i + 1 for i in sitenames]
 
-    daily_data = {"date": pd.date_range(
-    	start = pd.to_datetime(daily.Time(), unit = "s", utc = True),
-    	end =  pd.to_datetime(daily.TimeEnd(), unit = "s", utc = True),
-    	freq = pd.Timedelta(seconds = daily.Interval()),
-    	inclusive = "left"
-    )}
+    for i in range(len(lat)):
+        # Process first location. Add a for-loop for multiple locations or weather models
+        response = responses[i]
 
-    daily_data["temp_max"] = daily_temperature_2m_max
-    daily_data["temp_min"] = daily_temperature_2m_min
+        # Process daily data. The order of variables needs to be the same as requested.
+        daily = response.Daily()
+        daily_temperature_2m_max = daily.Variables(0).ValuesAsNumpy()
+        daily_temperature_2m_min = daily.Variables(1).ValuesAsNumpy()
 
-    daily_dataframe = pd.DataFrame(data = daily_data)
-    return daily_dataframe
+        daily_data = {"date": pd.date_range(
+        	start = pd.to_datetime(daily.Time(), unit = "s", utc = True),
+        	end =  pd.to_datetime(daily.TimeEnd(), unit = "s", utc = True),
+        	freq = pd.Timedelta(seconds = daily.Interval()),
+        	inclusive = "left"
+        )}
+
+        daily_data["temp_max"] = daily_temperature_2m_max
+        daily_data["temp_min"] = daily_temperature_2m_min
+
+        daily_dataframe = pd.DataFrame(data = daily_data)
+        daily_dataframe["latitude"] = lat[i]
+        daily_dataframe["longitude"] = long[i]
+        daily_dataframe["site"] = sitenames[i]
+
+        dataframe_list.append(daily_dataframe)
+    
+    full_data = pd.concat(dataframe_list, ignore_index=True)
+    return full_data
    

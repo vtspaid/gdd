@@ -3,8 +3,8 @@ import www.scripts.gdd_function as gdd_fun
 from shiny import App, render, ui, reactive, req
 import shinywidgets
 from ipyleaflet import Map, basemaps
-from shinywidgets import output_widget, render_widget
-import ipyleaflet
+import datetime
+import pandas as pd
 
 
 # User interface (UI) definition
@@ -24,6 +24,9 @@ app_ui = ui.page_sidebar(
     # A container for plot output
     shinywidgets.output_widget("usa_map"),
     ui.output_text("ans"),
+    ui.row(ui.column(6, ui.input_file("infile", "Select for Bulk Analysis")),
+           ui.column(6, ui.input_action_button("run_bulk", "Analyze CSV"))),
+    ui.output_table("bulk_output"),
     # A select input for choosing the variable to plot
     title = "Growing Degree Days Calculator"
 )
@@ -37,6 +40,7 @@ def server(input):
 
 
     gdd_result = reactive.Value("")
+    bulk_result = reactive.Value("")
     click_location = reactive.Value(None)
 
     @shinywidgets.render_widget
@@ -57,8 +61,7 @@ def server(input):
         return m
 
     @reactive.effect
-    def _():
-        print("is this even running")
+    def fake_name():
         req(click_location.get())
         loc = click_location.get()
         ui.update_numeric("lat", value = loc[0])
@@ -67,7 +70,7 @@ def server(input):
     @reactive.Effect
     @reactive.event(input.get_gdd)
     def compute_gdd():
-        temp_df = get_daily_temps(lat=input.lat(), long=input.long(), end=input.date())
+        temp_df = get_daily_temps(lat=[input.lat()], long=[input.long()], end=input.date())
         if (input.method() == "Method 1"):
             gdd_df = gdd_fun.gdd_method1(temp_df, 10, 29)
         else:
@@ -77,6 +80,41 @@ def server(input):
     @render.text
     def ans():
         return gdd_result.get()
+
+    @reactive.Effect
+    @reactive.event(input.run_bulk)
+    def compute_bulk_gdd():
+        req(input.infile)
+        print(input.infile())
+        datapath = input.infile()[0]["datapath"]
+        print("datapath is")
+        print(datapath)
+        data = pd.read_csv(datapath)
+        data.columns = [col.lower() for col in data.columns]
+        print(data.columns)
+        data['date'] = pd.to_datetime(data['date'])
+        data_sub = data[["site", "latitude", "longitude", "date"]].copy()
+        data_sub = data_sub.drop_duplicates().reset_index()
+        end_date = datetime.datetime.date(data_sub["date"].max())
+        print("did we get here")
+        result = get_daily_temps(lat=data_sub["latitude"], 
+                                long=data_sub["longitude"],
+                                end=end_date, sitenames=data_sub["site"])
+        result["date"] = result['date'].dt.tz_localize(None).dt.floor('D')
+        print("how about here")
+        result2 = gdd_fun.gdd_method1(result, 10, 29)
+        merged_df = pd.merge(data, result2, 
+        on=["site", "latitude", "longitude", "date"], how='left')
+        bulk_result.set(merged_df)
+
+    @render.table
+    def bulk_output():
+        print("trying")
+        result = bulk_result.get()
+        if (not isinstance(result, str)):
+            return result
+        else:
+            return None
 
 app = App(app_ui, server)
 
