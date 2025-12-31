@@ -1,0 +1,20 @@
+div.navbar.navbar-static-top{
+    background-color: rgba(160, 203, 248, 1);
+}
+
+.bslib-page-title {
+    font-size: 22pt;
+    font-weight: bold;
+    font-family: "Times New Roman", Times, serif;
+}
+
+.bulk_header {
+    text-align: center;
+    font-size: 16pt;
+    font-weight: bold;
+    font-family: "Times New Roman", Times, serif;
+}
+
+#infile_progress {
+    height:25px;
+}
