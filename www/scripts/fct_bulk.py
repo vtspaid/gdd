@@ -21,7 +21,7 @@ def validate_table_columns(table):
 # data_file = "www/test_data/firefly_test.csv"
 # datapath = data_file
 
-def get_gdd_from_csv(filepath):
+def get_gdd_from_csv(filepath, tmin = 10, tmax = 50, celsius = True):
         data = pd.read_csv(filepath)
         data.columns = [col.lower() for col in data.columns]
 
@@ -42,7 +42,7 @@ def get_gdd_from_csv(filepath):
                                      end=end_date, 
                                      sitenames=list(data_sub["site"]))
             result["date"] = result['date'].dt.tz_localize(None).dt.floor('D')
-            result2 = gdd_fun.gdd_method1(result, 10, 29)
+            result2 = gdd_fun.gdd_method1(result, tmin, tmax, celsius = celsius)
             output.append(result2)
         output_df = pd.concat(output)
         output_df.round(2)

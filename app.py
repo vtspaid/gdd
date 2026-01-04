@@ -89,7 +89,20 @@ def server(input, output, session):
     @reactive.event(input.run_bulk)
     def compute_bulk_gdd():
         req(input.infile)
-        bulk_data = get_gdd_from_csv(input.infile()[0]["datapath"])
+        
+        # Determine if the units are in celsius or not
+        if (get_reactive_values['unit']() == "Celsius"):
+            celsius = True
+        else:
+            celsius = False
+
+        # Find the gdd for the csv
+        bulk_data = get_gdd_from_csv(input.infile()[0]["datapath"],
+        get_reactive_values['tbase'](),
+        get_reactive_values['tmax'](),
+        celsius)
+
+        # Set the output value
         bulk_result.set(bulk_data)
 
     # Display results of multiple sites at once
