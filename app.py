@@ -78,7 +78,7 @@ def server(input, output, session):
                                             get_reactive_values['tmax'](),
                                             celsius = celsius)
             # Grab the last value of gdd in the returned dataframe
-            gdd_result.set(f"GDD = {str(round(gdd_df["gdd"].iloc[-1], 2))}")
+            gdd_result.set(f"GDD = {str(round(gdd_df['gdd'].iloc[-1], 2))}")
         except Exception as e:
             m = ui.modal(
                 str(e),
