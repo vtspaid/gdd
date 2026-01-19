@@ -54,30 +54,39 @@ def server(input, output, session):
     @reactive.Effect
     @get_reactive_values['get_gdd']
     def compute_gdd():
-        # Get the daily max and min for the time period
-        temp_df = get_daily_temps(lat=get_reactive_values['lat'](),
-                                  long=get_reactive_values['long'](),
-                                  end=get_reactive_values['date']())
+        try:
+            # Get the daily max and min for the time period
+            temp_df = get_daily_temps(lat=get_reactive_values['lat'](),
+                                    long=get_reactive_values['long'](),
+                                    end=get_reactive_values['date']())
 
-        # Determine if the units are in celsius or not
-        if (get_reactive_values['unit']() == "Celsius"):
-            celsius = True
-        else:
-            celsius = False
+            # Determine if the units are in celsius or not
+            if (get_reactive_values['unit']() == "Celsius"):
+                celsius = True
+            else:
+                celsius = False
 
-        # Run the calculations using either method 1 or 2
-        if (get_reactive_values['method']() == "Method 1"):
-            gdd_df = gdd_fun.gdd_method1(temp_df, 
-                                         get_reactive_values['tbase'](),
-                                         get_reactive_values['tmax'](),
-                                         celsius = celsius)
-        else:
-            gdd_df = gdd_fun.gdd_method2(temp_df, 
-                                         get_reactive_values['tbase'](),
-                                         get_reactive_values['tmax'](),
-                                         celsius = celsius)
-        # Grab the last value of gdd in the returned dataframe
-        gdd_result.set(f"GDD = {str(round(gdd_df["gdd"].iloc[-1], 2))}")
+            # Run the calculations using either method 1 or 2
+            if (get_reactive_values['method']() == "Method 1"):
+                gdd_df = gdd_fun.gdd_method1(temp_df, 
+                                            get_reactive_values['tbase'](),
+                                            get_reactive_values['tmax'](),
+                                            celsius = celsius)
+            else:
+                gdd_df = gdd_fun.gdd_method2(temp_df, 
+                                            get_reactive_values['tbase'](),
+                                            get_reactive_values['tmax'](),
+                                            celsius = celsius)
+            # Grab the last value of gdd in the returned dataframe
+            gdd_result.set(f"GDD = {str(round(gdd_df["gdd"].iloc[-1], 2))}")
+        except Exception as e:
+            m = ui.modal(
+                str(e),
+                title="An error occurred. Please check inputs.",
+                footer=ui.modal_button("Close"),
+                easy_close=True,
+            )
+            ui.modal_show(m)
    
     # Display GDD
     @render.text
@@ -88,29 +97,39 @@ def server(input, output, session):
     @reactive.Effect
     @reactive.event(input.run_bulk)
     def compute_bulk_gdd():
-        req(input.infile)
-        
-        # Determine if the units are in celsius or not
-        if (get_reactive_values['unit']() == "Celsius"):
-            celsius = True
-        else:
-            celsius = False
+        try:
+            req(input.infile)
+            
+            # Determine if the units are in celsius or not
+            if (get_reactive_values['unit']() == "Celsius"):
+                celsius = True
+            else:
+                celsius = False
 
-        # Find the gdd for the csv
-        bulk_data = get_gdd_from_csv(input.infile()[0]["datapath"],
-        get_reactive_values['tbase'](),
-        get_reactive_values['tmax'](),
-        celsius)
+            # Find the gdd for the csv
+            bulk_data = get_gdd_from_csv(input.infile()[0]["datapath"],
+            get_reactive_values['tbase'](),
+            get_reactive_values['tmax'](),
+            celsius,
+            method = get_reactive_values['method']())
 
-        # Set the output value
-        bulk_result.set(bulk_data)
+            # Set the output value
+            bulk_result.set(bulk_data)
+        except Exception as e:
+            m = ui.modal(
+                str(e),
+                title="An error occurred. Please check inputs.",
+                footer=ui.modal_button("Close"),
+                easy_close=True,
+            )
+            ui.modal_show(m)
 
     # Display results of multiple sites at once
     @render.data_frame
     def bulk_output():
         result = bulk_result.get()
         if (not isinstance(result, str)):
-            round_cols = ['temp_max', 'temp_min', 'single_day_gd', 'gdd']
+            round_cols = ['gdd']
             for col in round_cols:
                 result[col] = [f"{i:.{2}f}" for i in result[col]]
             result['latitude'] = [f"{i:.{6}f}" for i in result['latitude']]

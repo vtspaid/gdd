@@ -21,7 +21,8 @@ def validate_table_columns(table):
 # data_file = "www/test_data/firefly_test.csv"
 # datapath = data_file
 
-def get_gdd_from_csv(filepath, tmin = 10, tmax = 50, celsius = True):
+def get_gdd_from_csv(filepath, tmin = 10, tmax = 50, celsius = True,
+method = "Method 1"):
         data = pd.read_csv(filepath)
         data.columns = [col.lower() for col in data.columns]
 
@@ -32,6 +33,7 @@ def get_gdd_from_csv(filepath, tmin = 10, tmax = 50, celsius = True):
 
         data_fullsub = data[["site", "latitude", "longitude", "date"]].copy()
         data_fullsub = data_fullsub.drop_duplicates().reset_index()
+        data_fullsub = data_fullsub.dropna(subset= ["latitude", "longitude"])
         data_fullsub['year'] = data_fullsub['date'].dt.year
         output = list()
         for i in data_fullsub['year'].unique():
@@ -42,10 +44,16 @@ def get_gdd_from_csv(filepath, tmin = 10, tmax = 50, celsius = True):
                                      end=end_date, 
                                      sitenames=list(data_sub["site"]))
             result["date"] = result['date'].dt.tz_localize(None).dt.floor('D')
-            result2 = gdd_fun.gdd_method1(result, tmin, tmax, celsius = celsius)
+            result = result.drop_duplicates().reset_index()
+            if method == "Method 1":
+                result2 = gdd_fun.gdd_method1(result, tmin, tmax, celsius = celsius)
+            if method == "Method 2":
+                result2 = gdd_fun.gdd_method2(result, tmin, tmax, celsius = celsius)
             output.append(result2)
         output_df = pd.concat(output)
         output_df.round(2)
         merged_df = pd.merge(data, output_df, 
         on=["site", "latitude", "longitude", "date"], how='left')
-        return merged_df
+        return merged_df.drop(columns = [
+            'index', 'temp_max', 'temp_min', 'single_day_gd'
+            ])

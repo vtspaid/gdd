@@ -6,7 +6,9 @@ from ipyleaflet import Map, basemaps
 
 @module.ui
 def map_ui() -> ui.TagChild:
-    return shinywidgets.output_widget("usa_map")
+    return ("Click on the Map to Select a Location. The Answer will appear below the map.",
+        shinywidgets.output_widget("usa_map")
+    )
 
 @module.server
 def map_server(input: Inputs, output: Outputs, session: Session):
