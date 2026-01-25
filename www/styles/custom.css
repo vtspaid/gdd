@@ -1,6 +1,15 @@
 div.navbar.navbar-static-top{
     background-color: rgba(160, 203, 248, 1);
 }
+body > nav {
+    background-color:#a0cbf8;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 22pt;
+    font-family: "Times New Roman", Times, serif;
+}
 
 .bslib-page-title {
     font-size: 22pt;

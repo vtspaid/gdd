@@ -10,10 +10,11 @@ import pandas as pd
 pd.set_option('display.precision', 2)
 
 # User interface (UI) definition
-app_ui = ui.page_sidebar(
-
-    # Sidebar
-    sidebar_ui("sidebar"),
+app_ui = ui.page_navbar(
+    ui.nav_panel("GDD",
+    ui.page_sidebar(
+        # Sidebar
+        sidebar_ui("sidebar"),
 
     ui.include_css("www/styles/custom.css"),
 
@@ -35,8 +36,14 @@ app_ui = ui.page_sidebar(
            ui.column(4, ui.download_button("dl_data", "Download Results"))),
     ui.output_data_frame("bulk_output"),
     # A select input for choosing the variable to plot
-    title = "Growing Degree Days Calculator"
+    #title = "Growing Degree Days Calculator"
+    )
+    ),
+    ui.nav_panel(title = "Info"),
+    title = "Growing Degree Days Calculator",
+    #bg="#a0cbf8"
 )
+
 
 
 # Server function provides access to client-side input values
