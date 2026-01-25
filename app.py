@@ -45,14 +45,17 @@ app_ui = ui.page_navbar(
         ui.div(
              ui.h3("Disclaimer"),
              ui.p(gr.disclaimer_text),
+             ui.br(),
+             ui.p(gr.compare_text),
              class_ = "info_div"
         ),
+        ui.br(),
         ui.div(
              ui.h3("Data Sources"),
-             ui.p("openmetio"),
+             ui.p("openmetio:"),
              ui.p(gr.openmetio_text),
-             ui.br(), ui.br(),
-             ui.p("daymet"),
+             ui.br(),
+             ui.p("daymet:"),
              ui.p(gr.daymet_text),
              class_ = "info_div"
         )
