@@ -1,6 +1,15 @@
 div.navbar.navbar-static-top{
     background-color: rgba(160, 203, 248, 1);
 }
+body > nav {
+    background-color:#a0cbf8;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 22pt;
+    font-family: "Times New Roman", Times, serif;
+}
 
 .bslib-page-title {
     font-size: 22pt;
@@ -17,4 +26,12 @@ div.navbar.navbar-static-top{
 
 #infile_progress {
     height:25px;
+}
+
+.info_div {
+    background-color: #ecebebff;
+    width: 75%;
+    padding: 10px;
+    border-radius: 15px;
+    border: 3px solid black;
 }

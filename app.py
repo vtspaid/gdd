@@ -3,16 +3,19 @@ from www.scripts.modules.sidebar_module import sidebar_ui, sidebar_server
 from www.scripts.modules.map_module import map_ui, map_server
 from www.scripts.fct_bulk import get_gdd_from_csv
 import www.scripts.gdd_function as gdd_fun
+import www.scripts.fct_daymet as daymet
 from shiny import App, render, ui, reactive, req
 import pandas as pd
+import www.scripts.util_global_resources as gr
 
 pd.set_option('display.precision', 2)
 
 # User interface (UI) definition
-app_ui = ui.page_sidebar(
-
-    # Sidebar
-    sidebar_ui("sidebar"),
+app_ui = ui.page_navbar(
+    ui.nav_panel("GDD",
+    ui.page_sidebar(
+        # Sidebar
+        sidebar_ui("sidebar"),
 
     ui.include_css("www/styles/custom.css"),
 
@@ -34,8 +37,33 @@ app_ui = ui.page_sidebar(
            ui.column(4, ui.download_button("dl_data", "Download Results"))),
     ui.output_data_frame("bulk_output"),
     # A select input for choosing the variable to plot
-    title = "Growing Degree Days Calculator"
+    #title = "Growing Degree Days Calculator"
+    )
+    ),
+    ui.nav_panel(
+        "Info",
+        ui.div(
+             ui.h3("Disclaimer"),
+             ui.p(gr.disclaimer_text),
+             ui.br(),
+             ui.p(gr.compare_text),
+             class_ = "info_div"
+        ),
+        ui.br(),
+        ui.div(
+             ui.h3("Data Sources"),
+             ui.p("openmetio:"),
+             ui.p(gr.openmetio_text),
+             ui.br(),
+             ui.p("daymet:"),
+             ui.p(gr.daymet_text),
+             class_ = "info_div"
+        )
+        ),
+    title = "Growing Degree Days Calculator",
+    #bg="#a0cbf8"
 )
+
 
 
 # Server function provides access to client-side input values
@@ -56,9 +84,19 @@ def server(input, output, session):
     def compute_gdd():
         try:
             # Get the daily max and min for the time period
-            temp_df = get_daily_temps(lat=get_reactive_values['lat'](),
-                                    long=get_reactive_values['long'](),
-                                    end=get_reactive_values['date']())
+            if (get_reactive_values['source']() == "openmetio"):
+                print(get_reactive_values['source']() )
+                temp_df = get_daily_temps(lat=get_reactive_values['lat'](),
+                                        long=get_reactive_values['long'](),
+                                        end=get_reactive_values['date']())
+
+            if (get_reactive_values['source']() == "daymet"):
+                print(get_reactive_values['source']())
+                temp_df = daymet.get_daymet_temps(
+                                        lat=get_reactive_values['lat'](),
+                                        long=get_reactive_values['long'](),
+                                        end=get_reactive_values['date']()
+                                        )
 
             # Determine if the units are in celsius or not
             if (get_reactive_values['unit']() == "Celsius"):
@@ -111,7 +149,8 @@ def server(input, output, session):
             get_reactive_values['tbase'](),
             get_reactive_values['tmax'](),
             celsius,
-            method = get_reactive_values['method']())
+            method = get_reactive_values['method'](),
+            source = get_reactive_values['source']())
 
             # Set the output value
             bulk_result.set(bulk_data)

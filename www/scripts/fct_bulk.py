@@ -2,6 +2,7 @@ import pandas as pd
 import datetime
 from www.scripts.open_meteo import get_daily_temps
 import www.scripts.gdd_function as gdd_fun
+import www.scripts.fct_daymet as daymet
 
 def validate_table_columns(table):
 
@@ -22,7 +23,7 @@ def validate_table_columns(table):
 # datapath = data_file
 
 def get_gdd_from_csv(filepath, tmin = 10, tmax = 50, celsius = True,
-method = "Method 1"):
+method = "Method 1", source = "openmetio"):
         data = pd.read_csv(filepath)
         data.columns = [col.lower() for col in data.columns]
 
@@ -39,10 +40,16 @@ method = "Method 1"):
         for i in data_fullsub['year'].unique():
             data_sub = data_fullsub[data_fullsub['year'] == i]
             end_date = datetime.datetime.date(data_sub["date"].max())
-            result = get_daily_temps(lat=list(data_sub["latitude"]), 
-                                     long=list(data_sub["longitude"]),
-                                     end=end_date, 
-                                     sitenames=list(data_sub["site"]))
+            if source == "openmetio":
+                result = get_daily_temps(lat=list(data_sub["latitude"]), 
+                                        long=list(data_sub["longitude"]),
+                                        end=end_date, 
+                                        sitenames=list(data_sub["site"]))
+            if source == "daymet":
+                result = daymet.get_daymet_temps(lat=list(data_sub["latitude"]), 
+                                        long=list(data_sub["longitude"]),
+                                        end=end_date, 
+                                        sitenames=list(data_sub["site"]))
             result["date"] = result['date'].dt.tz_localize(None).dt.floor('D')
             result = result.drop_duplicates().reset_index()
             if method == "Method 1":
