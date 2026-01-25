@@ -3,6 +3,7 @@ from www.scripts.modules.sidebar_module import sidebar_ui, sidebar_server
 from www.scripts.modules.map_module import map_ui, map_server
 from www.scripts.fct_bulk import get_gdd_from_csv
 import www.scripts.gdd_function as gdd_fun
+import www.scripts.fct_daymet as daymet
 from shiny import App, render, ui, reactive, req
 import pandas as pd
 
@@ -56,9 +57,19 @@ def server(input, output, session):
     def compute_gdd():
         try:
             # Get the daily max and min for the time period
-            temp_df = get_daily_temps(lat=get_reactive_values['lat'](),
-                                    long=get_reactive_values['long'](),
-                                    end=get_reactive_values['date']())
+            if (get_reactive_values['source']() == "openmetio"):
+                print(get_reactive_values['source']() )
+                temp_df = get_daily_temps(lat=get_reactive_values['lat'](),
+                                        long=get_reactive_values['long'](),
+                                        end=get_reactive_values['date']())
+
+            if (get_reactive_values['source']() == "daymet"):
+                print(get_reactive_values['source']())
+                temp_df = daymet.get_daymet_temps(
+                                        lat=get_reactive_values['lat'](),
+                                        long=get_reactive_values['long'](),
+                                        end=get_reactive_values['date']()
+                                        )
 
             # Determine if the units are in celsius or not
             if (get_reactive_values['unit']() == "Celsius"):
@@ -111,7 +122,8 @@ def server(input, output, session):
             get_reactive_values['tbase'](),
             get_reactive_values['tmax'](),
             celsius,
-            method = get_reactive_values['method']())
+            method = get_reactive_values['method'](),
+            source = get_reactive_values['source']())
 
             # Set the output value
             bulk_result.set(bulk_data)
