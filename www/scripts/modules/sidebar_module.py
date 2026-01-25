@@ -16,6 +16,10 @@ def sidebar_ui() -> ui.TagChild:
             title = "McMaster, G. S., & Wilhelm, W. W. (1997). Growing degree-days: one equation, two interpretations. Agricultural and forest meteorology, 87(4), 291-300."
         ),
         ui.div(
+            ui.input_radio_buttons("source", "Data Source", ["openmetio", "daymet"]),
+            title = "openmetio: https://open-meteo.com  daymet: https://daymet.ornl.gov/"
+        ),
+        ui.div(
             ui.p("Settings for Single Location", style = "font-weight:bold;"),
             title = "Calculate GDD for a single location and date"
         ),
@@ -51,5 +55,6 @@ def sidebar_server(input: Inputs, output: Outputs, session: Session, click):
         'unit': reactive.calc(lambda: input.unit()),
         'date': reactive.calc(lambda: input.date()),
         'get_gdd': reactive.event(input.get_gdd), 
-        'method': reactive.calc(lambda: input.method())
+        'method': reactive.calc(lambda: input.method()),
+        'source': reactive.calc(lambda: input.source())
     }
