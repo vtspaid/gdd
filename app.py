@@ -6,6 +6,7 @@ import www.scripts.gdd_function as gdd_fun
 import www.scripts.fct_daymet as daymet
 from shiny import App, render, ui, reactive, req
 import pandas as pd
+import www.scripts.util_global_resources as gr
 
 pd.set_option('display.precision', 2)
 
@@ -39,7 +40,23 @@ app_ui = ui.page_navbar(
     #title = "Growing Degree Days Calculator"
     )
     ),
-    ui.nav_panel(title = "Info"),
+    ui.nav_panel(
+        "Info",
+        ui.div(
+             ui.h3("Disclaimer"),
+             ui.p(gr.disclaimer_text),
+             class_ = "info_div"
+        ),
+        ui.div(
+             ui.h3("Data Sources"),
+             ui.p("openmetio"),
+             ui.p(gr.openmetio_text),
+             ui.br(), ui.br(),
+             ui.p("daymet"),
+             ui.p(gr.daymet_text),
+             class_ = "info_div"
+        )
+        ),
     title = "Growing Degree Days Calculator",
     #bg="#a0cbf8"
 )
