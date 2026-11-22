@@ -7,6 +7,7 @@ import www.scripts.fct_daymet as daymet
 from shiny import App, render, ui, reactive, req
 import pandas as pd
 import www.scripts.util_global_resources as gr
+import shinyswatch
 
 pd.set_option('display.precision', 2)
 
@@ -21,7 +22,20 @@ app_ui = ui.page_navbar(
 
         map_ui("map"),
 
-        ui.output_text("ans"),
+        ui.br(),
+        ui.row(
+            ui.column(
+                3,
+                ui.card(
+                    ui.h3(
+                        "GDD = ",
+                        ui.output_text("ans"),
+                        style="display:flex; gap:0.25rem; align-items:center;"
+                    )
+                ),
+            )
+        ),
+       # theme=shinyswatch.theme.spacelab(),
     )
     ),
     ui.nav_panel("Process CSV",
@@ -120,7 +134,7 @@ def server(input, output, session):
                                             get_reactive_values['tmax'](),
                                             celsius = celsius)
             # Grab the last value of gdd in the returned dataframe
-            gdd_result.set(f"GDD = {str(round(gdd_df['gdd'].iloc[-1], 2))}")
+            gdd_result.set(f"{str(round(gdd_df['gdd'].iloc[-1], 2))}")
         except Exception as e:
             m = ui.modal(
                 str(e),

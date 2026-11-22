@@ -6,14 +6,33 @@ from ipyleaflet import Map, basemaps
 
 @module.ui
 def map_ui() -> ui.TagChild:
-    return ("Click on the Map to Select a Location. The Answer will appear below the map.",
-        shinywidgets.output_widget("usa_map")
+    return (
+        ui.card(
+            ui.card_header(
+                "Click on the map to select a coordinate, or enter coordinates in the sidebar."
+            ),
+            shinywidgets.output_widget("usa_map"),
+            ui.card_footer(
+                ui.row(
+                ui.column(4, ui.input_numeric("lat", "Latitude", 0)),
+                ui.column(4, ui.input_numeric("long", "Longitude", 0)),
+                ui.column(4, ui.input_action_button("show", "Get Growing Degree Days"))
+            )
+            )
+        )
     )
 
 @module.server
 def map_server(input: Inputs, output: Outputs, session: Session):
 
     click_location = reactive.Value(None)
+
+    @reactive.Effect
+    def _():
+        val = click_location.get()
+        if val is not None:
+            ui.update_numeric("lat", value=round(val[0], 9))
+            ui.update_numeric("long", value=round(val[1], 9))
 
     @shinywidgets.render_widget
     def usa_map():
