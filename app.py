@@ -8,75 +8,89 @@ from shiny import App, render, ui, reactive, req
 import pandas as pd
 import www.scripts.util_global_resources as gr
 
-pd.set_option('display.precision', 2)
+pd.set_option("display.precision", 2)
 
 # User interface (UI) definition
 app_ui = ui.page_navbar(
-    ui.nav_panel("GDD",
-    ui.page_fluid(
-        ui.include_css("www/styles/custom.css"),
-        # Sidebar
-        ui.row(
-            ui.column(1),
-            ui.column(
-                3, 
-                sidebar_ui("sidebar", interactive=True),
-                ui.br(),
-                ui.card(
-                    ui.h3(
-                        "GDD = ",
-                        ui.output_text("ans"),
-                        style="display:flex; gap:0.25rem; align-items:center;"
-                    )
-                )
-            ),
-            ui.column(7, map_ui("map")),
-            ui.column(1)
-        ),
-    )
-    ),
-    ui.nav_panel("Process CSV",
+    ui.nav_panel(
+        "GDD",
         ui.page_fluid(
-        # Sidebar
-        sidebar_ui("bulk_sidebar", interactive=False),
-                ui.div(ui.p("Process Many Locations at Once"), class_="bulk_header"),
-        ui.HTML("""To process many locations at once upload a CSV file containing
-        The following columns 'Site', 'Latitude', 'Longitude' and 'Date'. Then
-        hit the "Analyze CSV" button". A 
-        csv containing the growing degree days for each unique row will be
-        returned. All of the inputs from the sidebar are still used except the date,
-         latitude and longitude.
-        <br> <br>"""),
-        ui.row(ui.column(4, ui.input_file("infile", "")),
-               ui.column(4, ui.input_action_button("run_bulk", "Analyze CSV")),
-               ui.column(4, ui.download_button("dl_data", "Download Results"))),
-        ui.output_data_frame("bulk_output")
-    )
+            ui.include_css("www/styles/custom.css"),
+            # Sidebar
+            ui.row(
+                ui.column(1),
+                ui.column(
+                    3,
+                    sidebar_ui("sidebar", interactive=True),
+                    ui.br(),
+                    ui.card(
+                        ui.h3(
+                            "GDD = ",
+                            ui.output_text("ans"),
+                            style="display:flex; gap:0.25rem; align-items:center;",
+                        )
+                    ),
+                ),
+                ui.column(7, map_ui("map")),
+                ui.column(1),
+            ),
+        ),
+    ),
+    ui.nav_panel(
+        "Process CSV",
+        ui.page_fluid(
+            # Sidebar
+            ui.row(
+                ui.column(
+                    3,
+                    sidebar_ui("bulk_sidebar", interactive=False),
+                ),
+                ui.column(
+                    9,
+                    ui.h1("Process Locations from CSV", style_="text-align: center;"),
+                    ui.HTML(
+                        """To process multiple locations at once, upload a CSV file containing the
+                            columns 'Site', 'Latitude', 'Longitude', and 'Date'. Then click the
+                            "Analyze CSV" button.
+
+                            A CSV file containing the calculated growing degree days for each row
+                            will be generated and returned for download.
+
+                            <br><br>"""
+                    ),
+                    ui.row(
+                        ui.column(4, ui.input_file("infile", "")),
+                        ui.column(4, ui.input_action_button("run_bulk", "Analyze CSV")),
+                        ui.column(4, ui.download_button("dl_data", "Download Results")),
+                    ),
+                    ui.output_data_frame("bulk_output"),
+                ),
+            )
+        ),
     ),
     ui.nav_panel(
         "Info",
         ui.div(
-             ui.h3("Disclaimer"),
-             ui.p(gr.disclaimer_text),
-             ui.br(),
-             ui.p(gr.compare_text),
-             class_ = "info_div"
+            ui.h3("Disclaimer"),
+            ui.p(gr.disclaimer_text),
+            ui.br(),
+            ui.p(gr.compare_text),
+            class_="info_div",
         ),
         ui.br(),
         ui.div(
-             ui.h3("Data Sources"),
-             ui.p("openmetio:"),
-             ui.p(gr.openmetio_text),
-             ui.br(),
-             ui.p("daymet:"),
-             ui.p(gr.daymet_text),
-             class_ = "info_div"
-        )
+            ui.h3("Data Sources"),
+            ui.p("openmetio:"),
+            ui.p(gr.openmetio_text),
+            ui.br(),
+            ui.p("daymet:"),
+            ui.p(gr.daymet_text),
+            class_="info_div",
         ),
-    title = "Growing Degree Days Calculator",
-    #bg="#a0cbf8"
+    ),
+    title="Growing Degree Days Calculator",
+    # bg="#a0cbf8"
 )
-
 
 
 # Server function provides access to client-side input values
@@ -93,42 +107,48 @@ def server(input, output, session):
 
     # Return GDD based on sidebar inputs
     @reactive.Effect
-    @map_reactive_values['get_gdd']
+    @map_reactive_values["get_gdd"]
     def compute_gdd():
         try:
             print("runningS")
             # Get the daily max and min for the time period
-            if (get_reactive_values['source']() == "openmetio"):
-                print(get_reactive_values['source']() )
-                temp_df = get_daily_temps(lat=map_reactive_values['lat'](),
-                                        long=map_reactive_values['long'](),
-                                        end=get_reactive_values['date']())
+            if get_reactive_values["source"]() == "openmetio":
+                print(get_reactive_values["source"]())
+                temp_df = get_daily_temps(
+                    lat=map_reactive_values["lat"](),
+                    long=map_reactive_values["long"](),
+                    end=get_reactive_values["date"](),
+                )
 
-            if (get_reactive_values['source']() == "daymet"):
-                print(get_reactive_values['source']())
+            if get_reactive_values["source"]() == "daymet":
+                print(get_reactive_values["source"]())
                 temp_df = daymet.get_daymet_temps(
-                                        lat=map_reactive_values['lat'](),
-                                        long=map_reactive_values['long'](),
-                                        end=get_reactive_values['date']()
-                                        )
+                    lat=map_reactive_values["lat"](),
+                    long=map_reactive_values["long"](),
+                    end=get_reactive_values["date"](),
+                )
 
             # Determine if the units are in celsius or not
-            if (get_reactive_values['unit']() == "Celsius"):
+            if get_reactive_values["unit"]() == "Celsius":
                 celsius = True
             else:
                 celsius = False
 
             # Run the calculations using either method 1 or 2
-            if (get_reactive_values['method']() == "Method 1"):
-                gdd_df = gdd_fun.gdd_method1(temp_df, 
-                                            get_reactive_values['tbase'](),
-                                            get_reactive_values['tmax'](),
-                                            celsius = celsius)
+            if get_reactive_values["method"]() == "Method 1":
+                gdd_df = gdd_fun.gdd_method1(
+                    temp_df,
+                    get_reactive_values["tbase"](),
+                    get_reactive_values["tmax"](),
+                    celsius=celsius,
+                )
             else:
-                gdd_df = gdd_fun.gdd_method2(temp_df, 
-                                            get_reactive_values['tbase'](),
-                                            get_reactive_values['tmax'](),
-                                            celsius = celsius)
+                gdd_df = gdd_fun.gdd_method2(
+                    temp_df,
+                    get_reactive_values["tbase"](),
+                    get_reactive_values["tmax"](),
+                    celsius=celsius,
+                )
             # Grab the last value of gdd in the returned dataframe
             gdd_result.set(f"{str(round(gdd_df['gdd'].iloc[-1], 2))}")
         except Exception as e:
@@ -139,7 +159,7 @@ def server(input, output, session):
                 easy_close=True,
             )
             ui.modal_show(m)
-   
+
     # Display GDD
     @render.text
     def ans():
@@ -151,20 +171,22 @@ def server(input, output, session):
     def compute_bulk_gdd():
         try:
             req(input.infile)
-            
+
             # Determine if the units are in celsius or not
-            if (get_reactive_values_b['unit']() == "Celsius"):
+            if get_reactive_values_b["unit"]() == "Celsius":
                 celsius = True
             else:
                 celsius = False
 
             # Find the gdd for the csv
-            bulk_data = get_gdd_from_csv(input.infile()[0]["datapath"],
-            get_reactive_values_b['tbase'](),
-            get_reactive_values_b['tmax'](),
-            celsius,
-            method = get_reactive_values_b['method'](),
-            source = get_reactive_values_b['source']())
+            bulk_data = get_gdd_from_csv(
+                input.infile()[0]["datapath"],
+                get_reactive_values_b["tbase"](),
+                get_reactive_values_b["tmax"](),
+                celsius,
+                method=get_reactive_values_b["method"](),
+                source=get_reactive_values_b["source"](),
+            )
 
             # Set the output value
             bulk_result.set(bulk_data)
@@ -181,14 +203,14 @@ def server(input, output, session):
     @render.data_frame
     def bulk_output():
         result = bulk_result.get()
-        if (not isinstance(result, str)):
-            round_cols = ['gdd']
+        if not isinstance(result, str):
+            round_cols = ["gdd"]
             for col in round_cols:
                 result[col] = [f"{i:.{2}f}" for i in result[col]]
-            result['latitude'] = [f"{i:.{6}f}" for i in result['latitude']]
-            result['longitude'] = [f"{i:.{6}f}" for i in result['longitude']]
-            result['date'] = [str(i.date()) for i in result['date']]
-            return render.DataTable(result, height = "400pt")
+            result["latitude"] = [f"{i:.{6}f}" for i in result["latitude"]]
+            result["longitude"] = [f"{i:.{6}f}" for i in result["longitude"]]
+            result["date"] = [str(i.date()) for i in result["date"]]
+            return render.DataTable(result, height="400pt")
         else:
             return None
 
@@ -200,6 +222,7 @@ def server(input, output, session):
         result = bulk_result.get()
         # Convert DataFrame to CSV string
         yield result.to_csv(index=False)
+
 
 app = App(app_ui, server)
 

@@ -38,8 +38,12 @@ body > nav {
 
 }
 
-.navbar-nav {
+.navbar-nav, .navbar {
     --bs-nav-link-color: white;
+    --bs-nav-link-hover-color: #f49528;
+    --bs-navbar-active-color: #f49528;
+    --bs-navbar-brand-hover-color:white;
+    --bs-nav-link-font-size: 01.1rem;
 }
 
 .navbar-brand {
@@ -63,13 +67,6 @@ body {
 
 .bslib-page-title {
     font-size: 22pt;
-    font-weight: bold;
-    font-family: "Times New Roman", Times, serif;
-}
-
-.bulk_header {
-    text-align: center;
-    font-size: 16pt;
     font-weight: bold;
     font-family: "Times New Roman", Times, serif;
 }
