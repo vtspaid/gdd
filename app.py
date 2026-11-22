@@ -14,32 +14,28 @@ pd.set_option('display.precision', 2)
 # User interface (UI) definition
 app_ui = ui.page_navbar(
     ui.nav_panel("GDD",
-    ui.page_sidebar(
-        # Sidebar
-        sidebar_ui("sidebar", interactive=True),
-
+    ui.page_fluid(
         ui.include_css("www/styles/custom.css"),
-
-        map_ui("map"),
-
-        ui.br(),
+        # Sidebar
         ui.row(
             ui.column(
-                3,
+                3, 
+                sidebar_ui("sidebar", interactive=True),
+                ui.br(),
                 ui.card(
                     ui.h3(
                         "GDD = ",
                         ui.output_text("ans"),
                         style="display:flex; gap:0.25rem; align-items:center;"
                     )
-                ),
-            )
+                )
+            ),
+            ui.column(9, map_ui("map"))
         ),
-       # theme=shinyswatch.theme.spacelab(),
     )
     ),
     ui.nav_panel("Process CSV",
-        ui.page_sidebar(
+        ui.page_fluid(
         # Sidebar
         sidebar_ui("bulk_sidebar", interactive=False),
                 ui.div(ui.p("Process Many Locations at Once"), class_="bulk_header"),

@@ -29,10 +29,8 @@ def sidebar_ui(interactive=True) -> ui.TagChild:
             )
         )
     
-    return ui.sidebar(
-        children,
-        width = 370,
-        open="always"
+    return ui.card(
+        children
     )
     
 

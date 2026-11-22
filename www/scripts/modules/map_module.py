@@ -9,7 +9,7 @@ def map_ui() -> ui.TagChild:
     return (
         ui.card(
             ui.card_header(
-                "Click on the map to select a coordinate, or enter coordinates in the sidebar."
+                "Click on the map to select a coordinate, or enter coordinates below."
             ),
             shinywidgets.output_widget("usa_map"),
             ui.card_footer(
