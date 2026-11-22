@@ -16,7 +16,7 @@ def map_ui() -> ui.TagChild:
                 ui.row(
                 ui.column(4, ui.input_numeric("lat", "Latitude", 0)),
                 ui.column(4, ui.input_numeric("long", "Longitude", 0)),
-                ui.column(4, ui.input_action_button("show", "Get Growing Degree Days"))
+                ui.column(4, ui.input_action_button("get_gdd", "Get Growing Degree Days"))
             )
             )
         )
@@ -51,4 +51,8 @@ def map_server(input: Inputs, output: Outputs, session: Session):
         m.on_interaction(handle_click)
         return m
 
-    return click_location
+    return {
+        'lat': reactive.calc(lambda: [input.lat()]),
+        'long': reactive.calc(lambda: [input.long()]),
+        'get_gdd': reactive.event(input.get_gdd)
+    }

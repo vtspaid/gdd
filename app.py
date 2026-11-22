@@ -88,31 +88,30 @@ def server(input, output, session):
     gdd_result = reactive.Value("")
     bulk_result = reactive.Value("")
 
-    # Display the map and return lat and long in the click object
-    click = map_server("map")
-
     # Return sidebar inputs, update lat and long with click
-    get_reactive_values = sidebar_server("sidebar", click=click)
+    get_reactive_values = sidebar_server("sidebar")
+    map_reactive_values = map_server("map")
 
-    get_reactive_values_b = sidebar_server("bulk_sidebar", click=click)
+    get_reactive_values_b = sidebar_server("bulk_sidebar")
 
     # Return GDD based on sidebar inputs
     @reactive.Effect
-    @get_reactive_values['get_gdd']
+    @map_reactive_values['get_gdd']
     def compute_gdd():
         try:
+            print("runningS")
             # Get the daily max and min for the time period
             if (get_reactive_values['source']() == "openmetio"):
                 print(get_reactive_values['source']() )
-                temp_df = get_daily_temps(lat=get_reactive_values['lat'](),
-                                        long=get_reactive_values['long'](),
+                temp_df = get_daily_temps(lat=map_reactive_values['lat'](),
+                                        long=map_reactive_values['long'](),
                                         end=get_reactive_values['date']())
 
             if (get_reactive_values['source']() == "daymet"):
                 print(get_reactive_values['source']())
                 temp_df = daymet.get_daymet_temps(
-                                        lat=get_reactive_values['lat'](),
-                                        long=get_reactive_values['long'](),
+                                        lat=map_reactive_values['lat'](),
+                                        long=map_reactive_values['long'](),
                                         end=get_reactive_values['date']()
                                         )
 
