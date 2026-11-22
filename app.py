@@ -1,5 +1,6 @@
 from www.scripts.open_meteo import get_daily_temps
 from www.scripts.modules.sidebar_module import sidebar_ui, sidebar_server
+from pathlib import Path
 from www.scripts.modules.map_module import map_ui, map_server
 from www.scripts.fct_bulk import get_gdd_from_csv
 import www.scripts.gdd_function as gdd_fun
@@ -10,6 +11,10 @@ import www.scripts.util_global_resources as gr
 
 pd.set_option("display.precision", 2)
 
+tmax = ui.HTML("T<sub>MAX</sub>")
+tbase = ui.HTML("T<sub>BASE</sub>")
+tmin = ui.HTML("T<sub>MIN</sub>")
+
 # User interface (UI) definition
 app_ui = ui.page_navbar(
     ui.nav_panel(
@@ -18,7 +23,37 @@ app_ui = ui.page_navbar(
             ui.include_css("www/styles/custom.css"),
             # Sidebar
             ui.row(
-                ui.column(1),
+                ui.column(2, ui.card(
+                    ui.card_header("Details"),
+                    ui.img(src="images/gdd_fnx.png",
+                    style_="max-width:100%; height:auto;"),
+                    ui.div(
+                    ui.div("Method 1", style="font-weight:bold;margin-bottom:0.1;padding-bottom:0.1rem;"),
+                    ui.div("If [(", tmax, " + ", tmin, ")] / 2 < ", tbase, " then ",
+                    "[(", tmax, " + ", tmin, ")] / 2 = ", tbase, style="margin-top:0.1!important;padding-top:0.1rem;"),
+                    style="font-size:0.8em;"
+                    ),
+                    ui.div(
+                    ui.div("Method 2", style="font-weight:bold;margin-bottom:0.1;padding-bottom:0.1rem;"),
+                    ui.div("If ", tmax, " < ", tbase, " then ", tmax, " = ", tbase,
+                    ui.br(),
+                    " and ", ui.br(), " if ", tmin, " < ", tbase, " then ", tmin, " = ", tbase,
+                    style="margin-top:0.1!important;padding-top:0.1rem;"),
+                    style="font-size:0.8em;"
+                    ),
+                    ui.div(
+                        ui.div("Sources", style="font-weight:bold;margin-bottom:0.1;padding-bottom:0.1rem;"),
+                        ui.HTML(
+                            '<a href="https://open-meteo.com" target="_blank">openmetio</a>'
+                        ),
+                        ui.br(),
+                        ui.HTML(
+                            '<a href="https://daymet.ornl.gov/" target="_blank">Daymet</a>'
+                        ),
+                        style="font-size:0.8em;"
+                    ),
+                    ui.div("See the info tab for details")
+                    )),
                 ui.column(
                     3,
                     sidebar_ui("sidebar", interactive=True),
@@ -32,7 +67,7 @@ app_ui = ui.page_navbar(
                     ),
                 ),
                 ui.column(7, map_ui("map")),
-                ui.column(1),
+                #ui.column(1),
             ),
         ),
     ),
@@ -83,7 +118,7 @@ app_ui = ui.page_navbar(
             ui.p("openmetio:"),
             ui.p(gr.openmetio_text),
             ui.br(),
-            ui.p("daymet:"),
+            ui.p("Daymet:"),
             ui.p(gr.daymet_text),
             class_="info_div",
         ),
@@ -120,7 +155,7 @@ def server(input, output, session):
                     end=get_reactive_values["date"](),
                 )
 
-            if get_reactive_values["source"]() == "daymet":
+            if get_reactive_values["source"]() == "Daymet":
                 print(get_reactive_values["source"]())
                 temp_df = daymet.get_daymet_temps(
                     lat=map_reactive_values["lat"](),
@@ -224,7 +259,9 @@ def server(input, output, session):
         yield result.to_csv(index=False)
 
 
-app = App(app_ui, server)
+www_dir = Path(__file__).parent / "www"
+
+app = App(app_ui, server, static_assets=www_dir)
 
 if __name__ == "__main__":
     app.run()

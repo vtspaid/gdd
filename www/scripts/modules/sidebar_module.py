@@ -18,9 +18,9 @@ def sidebar_ui(interactive=True) -> ui.TagChild:
         ),
         ui.div(
             ui.input_radio_buttons(
-                "source", "Data Source", ["openmetio", "daymet"], inline=True
+                "source", "Data Source", ["openmetio", "Daymet"], inline=True
             ),
-            title="openmetio: https://open-meteo.com  daymet: https://daymet.ornl.gov/",
+            title="openmetio: https://open-meteo.com  Daymet: https://daymet.ornl.gov/",
         ),
         ui.row(
             ui.p("Day of Year to Start Counting", class_="control-label"),
