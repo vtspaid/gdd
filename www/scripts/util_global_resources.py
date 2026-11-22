@@ -2,19 +2,17 @@
 disclaimer_text = (
  "This data is being provided to meet the need for easy access ",
 "to current temperature and growing degree day information. The data sources ",
-"have not been reviewed by myself, and I make not claim on the accuracy of ",
-"the provided data. This data should not be used for scientific papers ",
-"or other publications. Use at your own risk"
+"have not been reviewed by myself, and I make no claim on the accuracy of ",
+"the provided data. Use at your own risk."
 )
 
 compare_text = (
     "The openmetio data and daymet data can provide very different answers. ",
-    "I caution against using this data in any emperical way, and instead ",
-    "using it for comparison only with itself. For example, using it to find ",
-    "the growing degree days of a specific location and date the previous ",
+    "Therefor the most informative way to use this data is in comparison to ",
+    " itself. For example, using it to find ",
+    "the growing degree days of a specific location and date the previous year ",
     "and checking to see if that location is on pace to achieve that same ",
-    "growing degree day in the current year when using all the same input ",
-    "parameters."
+    "growing degree day in the current year."
 )
 
 openmetio_text = (
@@ -24,7 +22,7 @@ openmetio_text = (
     "For data from the current date until two weeks from the current date it ",
     "Uses the weather forecast API (https://open-meteo.com/en/docs).",
     "Two important notes: The timezone is always assumed to be eastern, and ",
-    "the weather forecast (at least in WV) always seems to be a warmer ",
+    "the weather forecast (at least in WV) always seems to be warmer ",
     "than the actual weather. In other words, if you were to use the forecast ",
     "API for historical dates as well (which I did at first), you end up with ",
     "much higher GDD values than using the historical API. Since the forecast ",
