@@ -7,7 +7,6 @@ import www.scripts.fct_daymet as daymet
 from shiny import App, render, ui, reactive, req
 import pandas as pd
 import www.scripts.util_global_resources as gr
-import shinyswatch
 
 pd.set_option('display.precision', 2)
 
@@ -18,6 +17,7 @@ app_ui = ui.page_navbar(
         ui.include_css("www/styles/custom.css"),
         # Sidebar
         ui.row(
+            ui.column(1),
             ui.column(
                 3, 
                 sidebar_ui("sidebar", interactive=True),
@@ -30,7 +30,8 @@ app_ui = ui.page_navbar(
                     )
                 )
             ),
-            ui.column(9, map_ui("map"))
+            ui.column(7, map_ui("map")),
+            ui.column(1)
         ),
     )
     ),

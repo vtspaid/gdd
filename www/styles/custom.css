@@ -1,13 +1,54 @@
+.map-card {
+    --bs-card-spacer-y: 0rem;
+    --bs-card-spacer-x: 0rem;
+}
+
+.form-control, .form-select {
+    width: 100%;
+    padding: .205rem .4rem;
+    font-size: .9rem;
+    line-height: 1;
+}
+
+.form-group, .select {
+    margin-bottom: .2rem;
+}
+
+.input_card {
+    font-size: 0.9em;
+}
+
+.control-label {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.navbar {
+    color: white;
+}
 
 div.navbar.navbar-static-top{
     background-color:#a0cbf8;
+        color: white;
 }
 body > nav {
-    background-color:#b7d3ef;
+   /*  background-color:#b7d3ef; */
+    background-color:#5B3A8E;
+    color: white !important;
+
+}
+
+.navbar-nav {
+    --bs-nav-link-color: white;
+}
+
+.navbar-brand {
+    color: white;
 }
 
 body {
-   background-color: #f1f5f9
+  /* background-color: #f1f5f9 */
+   background-color: #ede5f8;
 }
 
 .sidebar{
