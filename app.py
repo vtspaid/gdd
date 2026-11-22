@@ -22,9 +22,13 @@ app_ui = ui.page_navbar(
         map_ui("map"),
 
         ui.output_text("ans"),
-        ui.tags.br(),
-    
-        ui.div(ui.p("Process Many Locations at Once"), class_="bulk_header"),
+    )
+    ),
+    ui.nav_panel("Process CSV",
+        ui.page_sidebar(
+        # Sidebar
+        sidebar_ui("bulk_sidebar", interactive=False),
+                ui.div(ui.p("Process Many Locations at Once"), class_="bulk_header"),
         ui.HTML("""To process many locations at once upload a CSV file containing
         The following columns 'Site', 'Latitude', 'Longitude' and 'Date'. Then
         hit the "Analyze CSV" button". A 
@@ -35,9 +39,7 @@ app_ui = ui.page_navbar(
         ui.row(ui.column(4, ui.input_file("infile", "")),
                ui.column(4, ui.input_action_button("run_bulk", "Analyze CSV")),
                ui.column(4, ui.download_button("dl_data", "Download Results"))),
-        ui.output_data_frame("bulk_output"),
-        # A select input for choosing the variable to plot
-        #title = "Growing Degree Days Calculator"
+        ui.output_data_frame("bulk_output")
     )
     ),
     ui.nav_panel(
@@ -77,6 +79,8 @@ def server(input, output, session):
 
     # Return sidebar inputs, update lat and long with click
     get_reactive_values = sidebar_server("sidebar", click=click)
+
+    get_reactive_values_b = sidebar_server("bulk_sidebar", click=click)
 
     # Return GDD based on sidebar inputs
     @reactive.Effect
@@ -139,18 +143,18 @@ def server(input, output, session):
             req(input.infile)
             
             # Determine if the units are in celsius or not
-            if (get_reactive_values['unit']() == "Celsius"):
+            if (get_reactive_values_b['unit']() == "Celsius"):
                 celsius = True
             else:
                 celsius = False
 
             # Find the gdd for the csv
             bulk_data = get_gdd_from_csv(input.infile()[0]["datapath"],
-            get_reactive_values['tbase'](),
-            get_reactive_values['tmax'](),
+            get_reactive_values_b['tbase'](),
+            get_reactive_values_b['tmax'](),
             celsius,
-            method = get_reactive_values['method'](),
-            source = get_reactive_values['source']())
+            method = get_reactive_values_b['method'](),
+            source = get_reactive_values_b['source']())
 
             # Set the output value
             bulk_result.set(bulk_data)
