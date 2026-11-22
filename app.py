@@ -8,6 +8,7 @@ import www.scripts.fct_daymet as daymet
 from shiny import App, render, ui, reactive, req
 import pandas as pd
 import www.scripts.util_global_resources as gr
+from datetime import datetime
 
 pd.set_option("display.precision", 2)
 
@@ -29,8 +30,8 @@ app_ui = ui.page_navbar(
                     style_="max-width:100%; height:auto;"),
                     ui.div(
                     ui.div("Method 1", style="font-weight:bold;margin-bottom:0.1;padding-bottom:0.1rem;"),
-                    ui.div("If [(", tmax, " + ", tmin, ")] / 2 < ", tbase, " then ",
-                    "[(", tmax, " + ", tmin, ")] / 2 = ", tbase, style="margin-top:0.1!important;padding-top:0.1rem;"),
+                    ui.div("If [(", tmax, " + ", tmin, ") / 2] < ", tbase, " then ",
+                    "[(", tmax, " + ", tmin, ") / 2] = ", tbase, style="margin-top:0.1!important;padding-top:0.1rem;"),
                     style="font-size:0.8em;"
                     ),
                     ui.div(
@@ -42,7 +43,10 @@ app_ui = ui.page_navbar(
                     style="font-size:0.8em;"
                     ),
                     ui.div(
-                        ui.div("Sources", style="font-weight:bold;margin-bottom:0.1;padding-bottom:0.1rem;"),
+                        ui.div(
+                            "Temperature Sources",
+                            style="font-weight:bold;margin-bottom:0.1;padding-bottom:0.1rem;"
+                            ),
                         ui.HTML(
                             '<a href="https://open-meteo.com" target="_blank">openmetio</a>'
                         ),
@@ -145,6 +149,13 @@ def server(input, output, session):
     @map_reactive_values["get_gdd"]
     def compute_gdd():
         try:
+            end_date = get_reactive_values["date"]()
+            start_month = get_reactive_values["month"]()
+            start_day = get_reactive_values["day"]()
+            start_date_str = f"{start_month} {start_day}, {end_date.year}"
+
+            start_date = datetime.strptime(start_date_str, "%B %d, %Y").date()
+
             print("runningS")
             # Get the daily max and min for the time period
             if get_reactive_values["source"]() == "openmetio":
@@ -152,7 +163,8 @@ def server(input, output, session):
                 temp_df = get_daily_temps(
                     lat=map_reactive_values["lat"](),
                     long=map_reactive_values["long"](),
-                    end=get_reactive_values["date"](),
+                    start=start_date,
+                    end=end_date,
                 )
 
             if get_reactive_values["source"]() == "Daymet":
@@ -160,7 +172,8 @@ def server(input, output, session):
                 temp_df = daymet.get_daymet_temps(
                     lat=map_reactive_values["lat"](),
                     long=map_reactive_values["long"](),
-                    end=get_reactive_values["date"](),
+                    start=start_date,
+                    end=end_date,
                 )
 
             # Determine if the units are in celsius or not

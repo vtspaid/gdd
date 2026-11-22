@@ -27,7 +27,7 @@ def sidebar_ui(interactive=True) -> ui.TagChild:
             ui.column(
                 6,
                 ui.input_select(
-                    "start_month",
+                    "month",
                     None,
                     [
                         "January",
@@ -45,7 +45,7 @@ def sidebar_ui(interactive=True) -> ui.TagChild:
                     ],
                 ),
             ),
-            ui.column(4, ui.input_select("start_day", None, list(range(1, 32)))),
+            ui.column(4, ui.input_select("day", None, list(range(1, 32)))),
         ),
     ]
 
@@ -67,6 +67,8 @@ def sidebar_server(input: Inputs, output: Outputs, session: Session):
         "tbase": reactive.calc(lambda: input.tbase()),
         "tmax": reactive.calc(lambda: input.tmax()),
         "unit": reactive.calc(lambda: input.unit()),
+        "month": reactive.calc(lambda: input.month()),
+        "day": reactive.calc(lambda: input.day()),
         "date": reactive.calc(lambda: input.date()),
         "method": reactive.calc(lambda: input.method()),
         "source": reactive.calc(lambda: input.source()),
