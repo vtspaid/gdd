@@ -4,63 +4,79 @@ from www.scripts.open_meteo import get_daily_temps
 import www.scripts.gdd_function as gdd_fun
 import www.scripts.fct_daymet as daymet
 
+
 def validate_table_columns(table):
 
     existing_columns = set(table.columns)
     required_columns_set = set(["site", "latitude", "longitude", "date"])
-    
+
     missing_columns = required_columns_set - existing_columns
-    
+
     if missing_columns:
-        raise ValueError(f"Input table is missing required columns: {
-            missing_columns}")
-    
+        raise ValueError(f"Input table is missing required columns: {missing_columns}")
+
     print("Table columns validated successfully.")
     return None
+
 
 # data_file2 = "www/test_data/test_sites.csv"
 # data_file = "www/test_data/firefly_test.csv"
 # datapath = data_file
 
-def get_gdd_from_csv(filepath, tmin = 10, tmax = 50, celsius = True,
-method = "Method 1", source = "openmetio"):
-        data = pd.read_csv(filepath)
-        data.columns = [col.lower() for col in data.columns]
 
-        # Check that the required columns are present
-        validate_table_columns(data)
+def get_gdd_from_csv(
+    filepath,
+    tmin=10,
+    tmax=50,
+    celsius=True,
+    method="Method 1",
+    source="openmetio",
+    use_max=True,
+):
+    data = pd.read_csv(filepath)
+    data.columns = [col.lower() for col in data.columns]
 
-        data['date'] = pd.to_datetime(data['date'], format = "mixed")
+    # Check that the required columns are present
+    validate_table_columns(data)
 
-        data_fullsub = data[["site", "latitude", "longitude", "date"]].copy()
-        data_fullsub = data_fullsub.drop_duplicates().reset_index()
-        data_fullsub = data_fullsub.dropna(subset= ["latitude", "longitude"])
-        data_fullsub['year'] = data_fullsub['date'].dt.year
-        output = list()
-        for i in data_fullsub['year'].unique():
-            data_sub = data_fullsub[data_fullsub['year'] == i]
-            end_date = datetime.datetime.date(data_sub["date"].max())
-            if source == "openmetio":
-                result = get_daily_temps(lat=list(data_sub["latitude"]), 
-                                        long=list(data_sub["longitude"]),
-                                        end=end_date, 
-                                        sitenames=list(data_sub["site"]))
-            if source == "daymet":
-                result = daymet.get_daymet_temps(lat=list(data_sub["latitude"]), 
-                                        long=list(data_sub["longitude"]),
-                                        end=end_date, 
-                                        sitenames=list(data_sub["site"]))
-            result["date"] = result['date'].dt.tz_localize(None).dt.floor('D')
-            result = result.drop_duplicates().reset_index()
-            if method == "Method 1":
-                result2 = gdd_fun.gdd_method1(result, tmin, tmax, celsius = celsius)
-            if method == "Method 2":
-                result2 = gdd_fun.gdd_method2(result, tmin, tmax, celsius = celsius)
-            output.append(result2)
-        output_df = pd.concat(output)
-        output_df.round(2)
-        merged_df = pd.merge(data, output_df, 
-        on=["site", "latitude", "longitude", "date"], how='left')
-        return merged_df.drop(columns = [
-            'index', 'temp_max', 'temp_min', 'single_day_gd'
-            ])
+    data["date"] = pd.to_datetime(data["date"], format="mixed")
+
+    data_fullsub = data[["site", "latitude", "longitude", "date"]].copy()
+    data_fullsub = data_fullsub.drop_duplicates().reset_index()
+    data_fullsub = data_fullsub.dropna(subset=["latitude", "longitude"])
+    data_fullsub["year"] = data_fullsub["date"].dt.year
+    output = list()
+    for i in data_fullsub["year"].unique():
+        data_sub = data_fullsub[data_fullsub["year"] == i]
+        end_date = datetime.datetime.date(data_sub["date"].max())
+        if source == "openmetio":
+            result = get_daily_temps(
+                lat=list(data_sub["latitude"]),
+                long=list(data_sub["longitude"]),
+                end=end_date,
+                sitenames=list(data_sub["site"]),
+            )
+        if source == "daymet":
+            result = daymet.get_daymet_temps(
+                lat=list(data_sub["latitude"]),
+                long=list(data_sub["longitude"]),
+                end=end_date,
+                sitenames=list(data_sub["site"]),
+            )
+        result["date"] = result["date"].dt.tz_localize(None).dt.floor("D")
+        result = result.drop_duplicates().reset_index()
+        if method == "Method 1":
+            result2 = gdd_fun.gdd_method1(
+                result, tmin, tmax, celsius=celsius, use_max=use_max
+            )
+        if method == "Method 2":
+            result2 = gdd_fun.gdd_method2(
+                result, tmin, tmax, celsius=celsius, use_max=use_max
+            )
+        output.append(result2)
+    output_df = pd.concat(output)
+    output_df.round(2)
+    merged_df = pd.merge(
+        data, output_df, on=["site", "latitude", "longitude", "date"], how="left"
+    )
+    return merged_df.drop(columns=["index", "temp_max", "temp_min", "single_day_gd"])

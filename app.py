@@ -257,6 +257,7 @@ def server(input, output, session):
                 celsius,
                 method=get_reactive_values_b["method"](),
                 source=get_reactive_values_b["source"](),
+                use_max=get_reactive_values_b["use_max"]()
             )
 
             # Set the output value
