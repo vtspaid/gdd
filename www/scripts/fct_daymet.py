@@ -42,7 +42,7 @@ def get_daymet_temps(lat, long, end, start=None, sitenames=None):
     if last_date.date() < end:
         raise ValueError(
             f"Daymet data not available for {end:%Y-%m-%d}. "
-            f"Last available date: {last_date:%Y-%m-%d}"
+            f"Last available date: {last_date.date():%Y-%m-%d}"
         )
     
     result_df = result_df[result_df['date'] in dates]
