@@ -22,7 +22,7 @@ def get_daymet_temps(lat, long, end, start=None, sitenames=None):
         to_xarray=True
     )
 
-    dates = pd.date_range(start=f"{end.year}-01-01", end=f"{end.year}-12-31")
+    dates = pd.date_range(start=start, end=end)
     df_list = list()
     for i in range(0, len(lat)):
         data = daily_data.sel(id=sitenames[i]).to_dataframe()
@@ -37,6 +37,14 @@ def get_daymet_temps(lat, long, end, start=None, sitenames=None):
         'tmax': 'temp_max', 'tmin': 'temp_min', 'id' : 'site'
         }, inplace=True)
 
-    result_df = result_df[result_df['date'] < str(end)]
+    last_date = result_df['date'].max()
+
+    if last_date < end:
+        raise ValueError(
+            f"Daymet data not available for {end:%Y-%m-%d}. "
+            f"Last available date: {last_date:%Y-%m-%d}"
+        )
+    
+    result_df = result_df[result_df['date'] in dates]
 
     return result_df

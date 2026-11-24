@@ -15,7 +15,6 @@ def get_daily_temps(lat, long, end, start=None, sitenames=None):
 
     if start is None:
         start = str(end.year) + "-01-01"
-    print("did this even start")
     print("lat: ", lat, "; long: ", long, "start: ", start, "; end: ", end)
 
     # We have to split the operation into two different api calls if the date

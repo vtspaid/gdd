@@ -1,12 +1,17 @@
 # This is method one
-def gdd_method1(data, min, max, min_name="temp_min", max_name="temp_max", celsius=True):
+def gdd_method1(
+    data, min, max, min_name="temp_min", max_name="temp_max", celsius=True, use_max=True
+):
     print("starting gdd_method 1")
     df = data.copy()
     if not celsius:
         df.loc[:, [min_name, max_name]] = df.loc[:, [min_name, max_name]] * 9 / 5
         df.loc[:, [min_name, max_name]] = df.loc[:, [min_name, max_name]] + 32
     df["single_day_gd"] = (df[max_name] + df[min_name]) / 2
-    df["single_day_gd"] = df["single_day_gd"].clip(lower=min, upper=max)
+    df["single_day_gd"] = df["single_day_gd"].clip(lower=min)
+    if use_max:
+        df["single_day_gd"] = df["single_day_gd"].clip(upper=max)
+
     df["single_day_gd"] = df["single_day_gd"] - min
     df["gdd"] = df.groupby(["site", "latitude", "longitude"])["single_day_gd"].cumsum()
     df[max_name] = round(df[max_name], 2)
@@ -16,7 +21,9 @@ def gdd_method1(data, min, max, min_name="temp_min", max_name="temp_max", celsiu
 
 
 # This is method two
-def gdd_method2(data, min, max, min_name="temp_min", max_name="temp_max", celsius=True):
+def gdd_method2(
+    data, min, max, min_name="temp_min", max_name="temp_max", celsius=True, use_max=True
+):
     df = data.copy()
     if not celsius:
         df.loc[:, [min_name, max_name]] = df.loc[:, [min_name, max_name]] * 9 / 5
@@ -24,6 +31,10 @@ def gdd_method2(data, min, max, min_name="temp_min", max_name="temp_max", celsiu
     df.loc[:, [min_name, max_name]] = df.loc[:, [min_name, max_name]].clip(
         lower=min, upper=max
     )
+    if use_max:
+        df.loc[:, [min_name, max_name]] = df.loc[:, [min_name, max_name]].clip(
+            upper=max
+        )
     df["single_day_gd"] = ((df[max_name] + df[min_name]) / 2) - min
     df["gdd"] = df.groupby(["site", "latitude", "longitude"])["single_day_gd"].cumsum()
     df[max_name] = round(df[max_name], 2)
@@ -32,7 +43,14 @@ def gdd_method2(data, min, max, min_name="temp_min", max_name="temp_max", celsiu
 
 
 def get_gdd(
-    data, min, max, min_name="temp_min", max_name="temp_max", celsius=True, method=1
+    data,
+    min,
+    max,
+    min_name="temp_min",
+    max_name="temp_max",
+    celsius=True,
+    method=1,
+    use_max=True,
 ):
 
     assert method in [1, 2], "Options for method argument are 1 or 2"
@@ -40,7 +58,7 @@ def get_gdd(
         raise TypeError("method should be an integer (either 1 or 2)")
 
     if method == 1:
-        return gdd_method1(data, min, max, min_name, max_name, celsius)
+        return gdd_method1(data, min, max, min_name, max_name, celsius, use_max)
 
     if method == 2:
-        return gdd_method2(data, min, max, min_name, max_name, celsius)
+        return gdd_method2(data, min, max, min_name, max_name, celsius, use_max)

@@ -1,14 +1,21 @@
 # Sidebar module
 from shiny import Inputs, Outputs, Session, module, reactive, ui
 
+tupper = ui.HTML("T<sub>UPPER</sub>")
+tbase = ui.HTML("T<sub>BASE</sub>")
 
 @module.ui
 def sidebar_ui(interactive=True) -> ui.TagChild:
 
     children = [
         ui.row(
-            ui.column(6, ui.input_numeric("tbase", "Tbase", 10)),
-            ui.column(6, ui.input_numeric("tmax", "Tmax", 50)),
+            ui.column(4, ui.input_numeric("tbase", tbase, 10)),
+            ui.column(4, ui.input_numeric("tmax", tupper, 30)),
+
+            ui.column(4, 
+            ui.div("Use " + tupper, class_="control-label"),
+            ui.div(ui.input_checkbox("use_max", None), style_="display:flex; justify-content:center;")
+            ),
         ),
         ui.input_radio_buttons("unit", None, ["Celsius", "Fahrenheit"], inline=True),
         ui.div(
@@ -66,6 +73,7 @@ def sidebar_server(input: Inputs, output: Outputs, session: Session):
     return {
         "tbase": reactive.calc(lambda: input.tbase()),
         "tmax": reactive.calc(lambda: input.tmax()),
+        "use_max": reactive.calc(lambda: input.use_max()),
         "unit": reactive.calc(lambda: input.unit()),
         "month": reactive.calc(lambda: input.month()),
         "day": reactive.calc(lambda: input.day()),

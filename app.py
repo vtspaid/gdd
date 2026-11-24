@@ -13,6 +13,7 @@ from datetime import datetime
 pd.set_option("display.precision", 2)
 
 tmax = ui.HTML("T<sub>MAX</sub>")
+tupper = ui.HTML("T<sub>UPPER</sub>")
 tbase = ui.HTML("T<sub>BASE</sub>")
 tmin = ui.HTML("T<sub>MIN</sub>")
 
@@ -41,6 +42,18 @@ app_ui = ui.page_navbar(
                     " and ", ui.br(), " if ", tmin, " < ", tbase, " then ", tmin, " = ", tbase,
                     style="margin-top:0.1!important;padding-top:0.1rem;"),
                     style="font-size:0.8em;"
+                    ),
+                    ui.div(
+                        ui.div(
+                            tupper,
+                            style="font-weight:bold;margin-bottom:0.1;padding-bottom:0.1rem;"
+                            ),
+
+                        ui.div("Use ", tupper, " means an upper bound will be",
+                        " applied with the same method as the lower bound. ",
+                        "Flip the sign and replace ", tbase, " with ", tupper, "."
+                        ),
+                        style="font-size:0.8em;"
                     ),
                     ui.div(
                         ui.div(
@@ -153,6 +166,7 @@ def server(input, output, session):
             start_month = get_reactive_values["month"]()
             start_day = get_reactive_values["day"]()
             start_date_str = f"{start_month} {start_day}, {end_date.year}"
+            use_max = get_reactive_values["use_max"]()
 
             start_date = datetime.strptime(start_date_str, "%B %d, %Y").date()
 
@@ -189,6 +203,7 @@ def server(input, output, session):
                     get_reactive_values["tbase"](),
                     get_reactive_values["tmax"](),
                     celsius=celsius,
+                    use_max=use_max
                 )
             else:
                 gdd_df = gdd_fun.gdd_method2(
@@ -196,6 +211,7 @@ def server(input, output, session):
                     get_reactive_values["tbase"](),
                     get_reactive_values["tmax"](),
                     celsius=celsius,
+                    use_max=use_max
                 )
             # Grab the last value of gdd in the returned dataframe
             gdd_result.set(f"{str(round(gdd_df['gdd'].iloc[-1], 2))}")
