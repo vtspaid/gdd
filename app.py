@@ -10,6 +10,7 @@ import pandas as pd
 import www.scripts.util_global_resources as gr
 from datetime import datetime
 
+
 pd.set_option("display.precision", 2)
 
 tmax = ui.HTML("T<sub>MAX</sub>")
@@ -23,6 +24,7 @@ app_ui = ui.page_navbar(
         "GDD",
         ui.page_fluid(
             ui.include_css("www/styles/custom.css"),
+            ui.busy_indicators.use(spinners=True),
             # Sidebar
             ui.row(
                 ui.column(2, ui.card(
@@ -229,6 +231,11 @@ def server(input, output, session):
     def ans():
         return gdd_result.get()
 
+    @reactive.Effect
+    @reactive.event(input.infile)
+    def erase_bulk_gdd():
+        bulk_result.set("")
+
     # Get GDD for multiple sites at once
     @reactive.Effect
     @reactive.event(input.run_bulk)
@@ -254,6 +261,7 @@ def server(input, output, session):
 
             # Set the output value
             bulk_result.set(bulk_data)
+
         except Exception as e:
             m = ui.modal(
                 str(e),
