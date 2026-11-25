@@ -1,7 +1,8 @@
 # Growing Degree Calculator App
 
-This is the source code for a Shiny app hosted at https://firefly-gdd.share.connect.posit.cloud/
-This app, is meant to help researchers plan surveys for plant and animal 
+This is the source code for a Shiny app hosted at https://firefly-gdd.share.connect.posit.cloud/.
+
+This app is meant to help researchers plan surveys for plant and animal 
 species dependent on growing degree days.
 
 ## Description 
