@@ -7,12 +7,14 @@ disclaimer_text = (
 )
 
 compare_text = (
-    "The openmetio data and daymet data can provide very different answers. ",
-    "Therefore the most informative way to use this data is in comparison to ",
-    " itself. For example, using it to find ",
-    "the growing degree days of a specific location and date the previous year ",
-    "and checking to see if that location is on pace to achieve that same ",
-    "growing degree day in the current year."
+    """
+    The openmetio data and daymet data can provide very different answers.
+    Therefore the most informative way to use this data is in comparison to
+    itself. For example, you could use it to find
+    the growing degree days of a specific location and date the previous year
+    and checking to see if that location is on pace to achieve that same
+    growing degree day in the current year.
+    """
 )
 
 openmetio_text = (
@@ -20,20 +22,20 @@ openmetio_text = (
     "includes data up until the previous day, it uses the historical weather ",
     "API (https://open-meteo.com/en/docs/historical-weather-api). ",
     "For data from the current date until two weeks from the current date it ",
-    "Uses the weather forecast API (https://open-meteo.com/en/docs)."
+    "uses the weather forecast API (https://open-meteo.com/en/docs)."
 )
 
 daymet_text = (
-    "This app also uses daymet data from https://daymet.ornl.gov/. I have not ",
+    "This app also uses Daymet data from https://daymet.ornl.gov. I have not ",
     "done a thorough analysis to see which data set is more accurate. ",
-    "The daymet data tends to predict fewer growing degree days than ",
+    "The Daymet data tends to predict fewer growing degree days than ",
     "openmetio.",
-    "I did one comparison between daymet, PRISM (https://prism.oregonstate.edu/), and openmetio in WV and ",
+    "I did one comparison between Daymet, PRISM (https://prism.oregonstate.edu), and openmetio in WV and ",
     "dayment consistently had the fewest GDD, followed by PRISM, followed by ",
-    "openmetio, and daymet and PRISM were somewhat closer to each other than ",
+    "openmetio, and Daymet and PRISM were somewhat closer to each other than ",
     "PRISM was to openmetio. PRISM data can not be easily download for specific ",
     "coordinates as far as I'm aware or it would be included in this app.",
-    " The main drawback of daymet is that it releases data one year ",
+    " The main drawback of Daymet is that it releases data one year ",
     "at a time, meaning for example that 2025 data will all be released at ",
-    "once sometime in 2026, and therefore you cannot get realtime GDD"
+    "once sometime in 2026, and therefore you cannot get realtime GDD."
 )
