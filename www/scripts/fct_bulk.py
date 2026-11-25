@@ -56,7 +56,7 @@ def get_gdd_from_csv(
                 end=end_date,
                 sitenames=list(data_sub["site"]),
             )
-        if source == "daymet":
+        if source == "Daymet":
             result = daymet.get_daymet_temps(
                 lat=list(data_sub["latitude"]),
                 long=list(data_sub["longitude"]),
