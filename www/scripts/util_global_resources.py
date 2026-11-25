@@ -8,7 +8,7 @@ disclaimer_text = (
 
 compare_text = (
     "The openmetio data and daymet data can provide very different answers. ",
-    "Therefor the most informative way to use this data is in comparison to ",
+    "Therefore the most informative way to use this data is in comparison to ",
     " itself. For example, using it to find ",
     "the growing degree days of a specific location and date the previous year ",
     "and checking to see if that location is on pace to achieve that same ",

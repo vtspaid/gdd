@@ -4,6 +4,9 @@ import pandas as pd
 
 def get_daymet_temps(lat, long, end, start=None, sitenames=None):
 
+    if start is None:
+        start = str(end.year) + "-01-01"
+
     if sitenames is None:
         sitenames = list(range(0, len(lat)))
         sitenames  = [i + 1 for i in sitenames]

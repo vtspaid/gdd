@@ -78,7 +78,7 @@ def info_ui() -> ui.TagChild:
                             ui.tags.li(
                                 ui.tags.b("Use ", tupper, " checkbox: "),
                                 """
-                Controls wether or not the upper threshold is applied.
+                Controls whether or not the upper threshold is applied.
                 """,
                             ),
                             ui.tags.li(
