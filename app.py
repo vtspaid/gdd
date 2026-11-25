@@ -1,3 +1,4 @@
+from www.scripts.modules.info_module import info_ui
 from www.scripts.open_meteo import get_daily_temps
 from www.scripts.modules.sidebar_module import sidebar_ui, sidebar_server
 from pathlib import Path
@@ -7,7 +8,6 @@ import www.scripts.gdd_function as gdd_fun
 import www.scripts.fct_daymet as daymet
 from shiny import App, render, ui, reactive, req
 import pandas as pd
-import www.scripts.util_global_resources as gr
 from datetime import datetime
 
 
@@ -124,26 +124,9 @@ app_ui = ui.page_navbar(
     ),
     ui.nav_panel(
         "Info",
-        ui.div(
-            ui.h3("Disclaimer"),
-            ui.p(gr.disclaimer_text),
-            ui.br(),
-            ui.p(gr.compare_text),
-            class_="info_div",
-        ),
-        ui.br(),
-        ui.div(
-            ui.h3("Data Sources"),
-            ui.p("openmetio:"),
-            ui.p(gr.openmetio_text),
-            ui.br(),
-            ui.p("Daymet:"),
-            ui.p(gr.daymet_text),
-            class_="info_div",
-        ),
+        info_ui("info")
     ),
     title="Growing Degree Days Calculator",
-    # bg="#a0cbf8"
 )
 
 
